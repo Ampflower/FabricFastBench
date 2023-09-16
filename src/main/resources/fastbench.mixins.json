@@ -4,12 +4,10 @@
   "compatibilityLevel": "JAVA_16",
   "mixins": [
     "ContainerAccessor",
-    "CraftingContainerAccessor",
     "CraftingContainerMixin",
     "CraftingInventoryAccessor",
     "CraftingMenuMixin",
     "CraftingResultSlotMixin",
-    "PlayerContainerAccessor",
     "PlayerContainerMixin",
     "RecipeManagerMixin",
     "ServerPlaceRecipeMixin"
