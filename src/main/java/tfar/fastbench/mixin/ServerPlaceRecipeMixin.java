@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2022-2023 Ampflower
+ *
+ * This software is subject to the terms of either the MIT or CC0-1.0 Licenses.
+ * If a copy was not distributed with this file, you can obtain one at
+ * https://github.com/Modflower/QuickBench/blob/trunk/LICENSE-MIT
+ * https://github.com/Modflower/QuickBench/blob/trunk/LICENSE-CC0
+ *
+ * Sources:
+ *  - https://github.com/Modflower/QuickBench
+ *
+ * SPDX-License-Identifier: MIT OR CC0-1.0
+ *
+ * Additional details are outlined in LICENSE.md, which you can obtain at
+ * https://github.com/Modflower/QuickBench/blob/trunk/LICENSE.md
+ */
+
 package tfar.fastbench.mixin;// Created 2022-05-12T13:17:33
 
 import net.minecraft.recipebook.ServerPlaceRecipe;

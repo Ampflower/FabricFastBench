@@ -1,3 +1,29 @@
+/*
+ * Copyright (c) 2022-2023 Ampflower
+ * Copyright (c) 2020-2021 Tfarcenim
+ * Copyright (c) 2018-2021 Brennan Ward
+ *
+ * This software is subject to the terms of the MIT License.
+ * If a copy was not distributed with this file, you can obtain one at
+ * https://github.com/Modflower/QuickBench/blob/trunk/LICENSE-MIT
+ *
+ * Sources:
+ *  - https://github.com/Modflower/QuickBench
+ *  - https://github.com/Tfarcenim/FabricFastBench
+ *  - https://github.com/Shadows-of-Fire/FastWorkbench
+ *
+ * SPDX-License-Identifier: MIT
+ *
+ * Contributions from Ampflower may additionally be available under CC0-1.0,
+ * as part of the pull-request for upstreaming to FabricFastBench.
+ * If a copy was not distributed with this file, you can obtain one at
+ * https://github.com/Modflower/QuickBench/blob/trunk/LICENSE-CC0
+ *
+ * Additional details are outlined in LICENSE.md, which you can obtain at
+ * https://github.com/Modflower/QuickBench/blob/trunk/LICENSE.md
+ */
+// This file has been traced to be sourced from `shadows.fastbench.util.CraftResultSlotExt`
+
 package tfar.fastbench.mixin;
 
 
@@ -47,7 +73,7 @@ public class CraftingResultSlotMixin extends Slot {
 	}
 
 	@Redirect(method = "checkTakeAchievements",
-					at = @At(value = "INVOKE",target = "Lnet/minecraft/world/inventory/RecipeHolder;awardUsedRecipes(Lnet/minecraft/world/entity/player/Player;)V"))
+			at = @At(value = "INVOKE",target = "Lnet/minecraft/world/inventory/RecipeHolder;awardUsedRecipes(Lnet/minecraft/world/entity/player/Player;)V"))
 	public void no(RecipeHolder recipeUnlocker, Player player) {
 		if (((CraftingInventoryDuck) craftSlots).getCheckMatrixChanges() &&
 				this.container instanceof RecipeHolder recipeHolder) {
