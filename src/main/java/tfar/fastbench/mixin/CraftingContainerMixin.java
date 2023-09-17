@@ -28,7 +28,7 @@ package tfar.fastbench.mixin;
 
 import net.minecraft.world.Container;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.world.inventory.TransientCraftingContainer;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -36,7 +36,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import tfar.fastbench.interfaces.CraftingInventoryDuck;
 
-@Mixin(CraftingContainer.class)
+@Mixin(TransientCraftingContainer.class)
 public class CraftingContainerMixin implements CraftingInventoryDuck {
 
 	@Shadow

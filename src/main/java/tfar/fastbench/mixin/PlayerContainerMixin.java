@@ -57,7 +57,7 @@ abstract class PlayerContainerMixin extends AbstractContainerMenu implements Cra
 
 	@Inject(method = "slotsChanged", at = @At("HEAD"))
 	private void updateResult(Container inventory, CallbackInfo ci) {
-		MixinHooks.slotChangedCraftingGrid(owner.level, craftSlots, resultSlots);
+		MixinHooks.slotChangedCraftingGrid(owner.level(), craftSlots, resultSlots);
 	}
 
 	@Inject(method = "quickMoveStack", at = @At("HEAD"), cancellable = true)
