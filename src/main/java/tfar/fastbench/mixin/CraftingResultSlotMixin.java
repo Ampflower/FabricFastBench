@@ -74,7 +74,7 @@ public class CraftingResultSlotMixin extends Slot {
 
 	@Redirect(method = "checkTakeAchievements",
 			at = @At(value = "INVOKE",target = "Lnet/minecraft/world/inventory/RecipeHolder;awardUsedRecipes(Lnet/minecraft/world/entity/player/Player;)V"))
-	public void no(RecipeHolder recipeUnlocker, Player player) {
+	public void no(Player player) {
 		if (((CraftingInventoryDuck) craftSlots).getCheckMatrixChanges() &&
 				this.container instanceof RecipeHolder recipeHolder) {
 			var recipeUsed = recipeHolder.getRecipeUsed();
