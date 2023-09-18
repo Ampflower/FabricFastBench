@@ -6,12 +6,12 @@ of [Fast Workbench for Forge][FastWorkbench-curse] and [FastBench for Fabric][Fa
 ## How does it work?
 
 Inherited from Fast Workbench and FastBench,
-QuickBench caches the last used recipe within a given screen,
-and optimises the shift+click crafting to prevent executing the matrix calculation,
+QuickBench optimises the shift+click crafting to prevent executing the matrix calculation,
 reducing network traffic in the process.
 
 QuickBench also reintroduces the ability to 'learn' recipes by using them, mimicking vanilla behaviour,
-and allows you to use it solely server-side, allowing any server to add it in and benefit to everyone.
+and allows you to use it solely server-side,
+allowing any server to add it in and benefit to everyone.<sup>[[upstream's #8]]</sup>
 
 This benefit is provided to various crafting tables, including ones using the vanilla classes,
 allowing modded use to be seamless as long as various mods play nicely.
@@ -27,7 +27,7 @@ If you find any bugs or parity issues, including mod compatibility, feel free to
 
 ### Optimises
 
-- Botania's Assembly & Manufactory Halo (also fixes [upstream's #21])
+- Botania's Assembly & Manufactory Halo<sup>(also fixes [upstream's #21])</sup>
 - Crafting Pad
 - Portable Tables' Crafting Table
 
@@ -42,6 +42,7 @@ The crafting output slot now works with these mods, which broke with FastBench:
 - Enhanced Project Table
 - Crafting Craft's Inventory & Portable Crafting
 - FabricAutoCrafter
+- Inventorio<sup>(also tracked at [upstream's #17])</sup>
 
 ### Doesn't effect:
 
@@ -108,6 +109,10 @@ both [FastWorkbench][FastWorkbench-git] and [FastBench for Fabric][FabricFastBen
 
 [issue tracker]: https://github.com/Modflower/QuickBench/issues
 
+[upstream's #8]: https://github.com/Tfarcenim/FabricFastBench/issues/8
+
+[upstream's #17]: https://github.com/Tfarcenim/FabricFastBench/issues/17
+
 [upstream's #20]: https://github.com/Tfarcenim/FabricFastBench/issues/20
 
-[upstream's #21]: https://github.com/Tfarcenim/FabricFastBench/issues/20
+[upstream's #21]: https://github.com/Tfarcenim/FabricFastBench/issues/21
