@@ -1,7 +1,10 @@
 # QuickBench
 
-A crafting table optimisation mod, improving compute and networking performance of various crafting tables, based off
-of [Fast Workbench for Forge][FastWorkbench-curse] and [FastBench for Fabric][FastWorkbench-curse].
+A crafting table optimisation mod for Fabric & Quilt,
+improving compute and networking performance of various crafting tables,
+based off of [Fast Workbench for Forge][FastWorkbench-curse] and [FastBench for Fabric][FastWorkbench-curse].
+
+If you'd like a Forge version of QuickBench, check out [FastWorkbench for Forge][FastWorkbench-curse].
 
 ## How does it work?
 
