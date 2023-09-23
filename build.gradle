@@ -1,49 +1,45 @@
 plugins {
-    id 'fabric-loom' version '1.0-SNAPSHOT'
+    alias(libs.plugins.loom)
+    alias(libs.plugins.minotaur)
+    alias(libs.plugins.cursegradle)
     id 'maven-publish'
 }
 
 java {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
+    withSourcesJar()
 }
 
-version = project.minecraft_version + "-" + project.mod_version
+final isPublish = System.getenv("GITHUB_EVENT_NAME") == "release"
+final isRelease = System.getenv("BUILD_RELEASE")?.toBoolean() ?: false
+final isActions = System.getenv("GITHUB_ACTIONS")?.toBoolean() ?: false
+final baseVersion = "$projectVersion+mc.${libs.versions.minecraft.version.get()}"
+version = isRelease ? baseVersion :
+        isActions ? "$baseVersion-build.${System.getenv("GITHUB_RUN_NUMBER")}-commit.${System.getenv("GITHUB_SHA").substring(0, 7)}-branch.${System.getenv("GITHUB_REF")?.substring(11)?.replace('/', '.') ?: "unknown"}" :
+                "$baseVersion-build.local"
 group = project.maven_group
 
 dependencies {
-    //to change the versions see the gradle.properties file
-    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    minecraft(libs.minecraft)
     mappings(loom.officialMojangMappings())
-    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-
-    //modRuntime "diggusmaximus:diggusmaximus:1.3.1-1.16"
-
-    // Fabric API. This is technically optional, but you probably want it anyway.
-    compileOnly "com.google.code.findbugs:jsr305:+"
-
-    // PSA: Some older mods, compiled on Loom 0.2.1, might have outdated Maven POMs.
-    // You may need to force-disable transitiveness on them.
+    modImplementation(libs.fabric.loader)
+    compileOnly(libs.bundles.compile)
 }
 
 processResources {
     inputs.property "version", project.version
 
     filesMatching("fabric.mod.json") {
-        expand "version": project.version
+        expand "version": project.version,
+                "java": java.targetCompatibility.majorVersion,
+                "minecraftRequired": libs.versions.minecraft.required.get()
     }
 }
 
 tasks.withType(JavaCompile).configureEach {
     // Minecraft 1.18 (1.18-pre2) upwards uses Java 17.
     it.options.release = 17
-}
-
-java {
-    // Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
-    // if it is present.
-    // If you remove this line, sources will not be generated.
-    withSourcesJar()
 }
 
 jar {
@@ -67,4 +63,40 @@ publishing {
         // The repositories here will be used for publishing your artifact, not for
         // retrieving dependencies.
     }
+}
+
+import java.nio.charset.StandardCharsets
+
+final ref = System.getenv("GITHUB_REF")
+final String _changelog = System.getenv("CHANGELOG") ?:
+        (ref != null && ref.startsWith("refs/tags/")) ?
+                "You may view the changelog at https://github.com/Modflower/music-moods/releases/tag/${URLEncoder.encode(ref.substring(10), StandardCharsets.UTF_8)}" :
+                "No changelog is available. Perhaps poke at https://github.com/Modflower/music-moods for a changelog?"
+
+final type = System.getenv("RELEASE_OVERRIDE") ?:
+        projectVersion?.contains("alpha") ? "alpha" :
+                !isRelease || projectVersion.contains('-') ? "beta" :
+                        "release"
+
+final minecraftCompatible = libs.versions.minecraft.compatible.get().split(",").toList()
+
+curseforge {
+    project {
+        apiKey = System.getenv("CURSEFORGE_TOKEN")
+        id = curseforgeId
+        changelog = _changelog
+        releaseType = type
+        gameVersionStrings.addAll(minecraftCompatible)
+        mainArtifact(remapJar)
+    }
+}
+
+modrinth {
+    token.set(System.getenv("MODRINTH_TOKEN"))
+    projectId.set(modrinthId)
+    versionType.set(type)
+    changelog.set(_changelog)
+    uploadFile.set(tasks.remapJar)
+    gameVersions.set(minecraftCompatible)
+    loaders.addAll("fabric", "quilt")
 }

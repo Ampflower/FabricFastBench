@@ -1,35 +1,38 @@
 {
   "schemaVersion": 1,
-  "id": "fastbench",
+  "id": "quickbench",
   "version": "${version}",
-
-  "name": "FastBench",
+  "name": "QuickBench",
   "description": "Optimizations to the vanilla crafting table",
   "authors": [
-    "Tfarecnim"
+    "Ampflower",
+    "Tfarecnim",
+    "Shadows-of-Fire"
+  ],
+  "provides": [
+    "fastbench"
   ],
   "contact": {
-    "homepage": "https://fabricmc.net/",
-    "sources": "https://github.com/FabricMC/fabric-example-mod"
+    "homepage": "https://mod.ampflower.gay/QuickBench",
+    "sources": "https://github.com/Modflower/QuickBench",
+    "issues": "https://github.com/Modflower/QuickBench/issues",
+    "discord": "https://discord.gg/EmPS9y9"
   },
-
-  "license": "CC0-1.0",
-
+  "license": "MIT",
+  "icon": "assets/quickbench/pack.png",
   "environment": "*",
-  "entrypoints": {
-    "main": [
-    ],
-    "client": [
-    ]
-  },
   "mixins": [
-    "fastbench.mixins.json"
+    "quickbench.mixins.json"
   ],
-
   "depends": {
-    "fabricloader": ">=0.7.2"
+    "fabricloader": ">=0.7.2",
+    "minecraft": ">=${minecraftRequired}"
   },
-  "suggests": {
-    "flamingo": "*"
+  "custom": {
+    "modmenu": {
+      "links": {
+        "modmenu.discord": "https://discord.gg/EmPS9y9"
+      }
+    }
   }
 }
