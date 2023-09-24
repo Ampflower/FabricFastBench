@@ -26,13 +26,16 @@
 
 package tfar.fastbench;
 
+import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.inventory.ResultContainer;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import tfar.fastbench.interfaces.CraftingInventoryDuck;
@@ -51,11 +54,11 @@ public class MixinHooks {
 
 			ItemStack itemstack = ItemStack.EMPTY;
 
-			Recipe<CraftingContainer> recipe = (Recipe<CraftingContainer>) result.getRecipeUsed();
-			if (recipe == null || !recipe.matches(inv, level)) recipe = findRecipe(inv, level);
+			RecipeHolder<CraftingRecipe> recipe = coerce(result.getRecipeUsed());
+			if (recipe == null || !recipe.value().matches(inv, level)) recipe = findRecipe(inv, level);
 
 			if (recipe != null) {
-				itemstack = recipe.assemble(inv);
+				itemstack = recipe.value().assemble(inv, level.registryAccess());
 			}
 
 			result.setItem(0, itemstack);
@@ -68,16 +71,17 @@ public class MixinHooks {
 		ItemStack outputCopy = ItemStack.EMPTY;
 		CraftingInventoryDuck duck = (CraftingInventoryDuck) input;
 		duck.setCheckMatrixChanges(false);
-		Recipe<CraftingContainer> recipe = (Recipe<CraftingContainer>) craftResult.getRecipeUsed();
+		RecipeHolder<CraftingRecipe> recipeHolder = coerce(craftResult.getRecipeUsed());
 
-		if (recipe != null && resultSlot != null && resultSlot.hasItem()) {
-			while (recipe.matches(input, player.level)) {
+		if (recipeHolder != null && resultSlot != null && resultSlot.hasItem()) {
+			final Recipe<CraftingContainer> recipe = recipeHolder.value();
+			while (recipe.matches(input, player.level())) {
 				ItemStack recipeOutput = resultSlot.getItem().copy();
 				outputCopy = recipeOutput.copy();
 
-				recipeOutput.getItem().onCraftedBy(recipeOutput, player.level, player);
+				recipeOutput.getItem().onCraftedBy(recipeOutput, player.level(), player);
 
-				if (!player.level.isClientSide && !((ContainerAccessor) container).insert(recipeOutput, outStart, outEnd, true)) {
+				if (!player.level().isClientSide && !((ContainerAccessor) container).insert(recipeOutput, outStart, outEnd, true)) {
 					duck.setCheckMatrixChanges(true);
 					return ItemStack.EMPTY;
 				}
@@ -85,7 +89,7 @@ public class MixinHooks {
 				resultSlot.onQuickCraft(recipeOutput, outputCopy);
 				resultSlot.setChanged();
 
-				if (!player.level.isClientSide && recipeOutput.getCount() == outputCopy.getCount()) {
+				if (!player.level().isClientSide && recipeOutput.getCount() == outputCopy.getCount()) {
 					duck.setCheckMatrixChanges(true);
 					return ItemStack.EMPTY;
 				}
@@ -95,18 +99,22 @@ public class MixinHooks {
 				//player.drop(resultSlot.getItem(), false);
 			}
 			duck.setCheckMatrixChanges(true);
-			slotChangedCraftingGrid(player.level, input, craftResult);
+			slotChangedCraftingGrid(player.level(), input, craftResult);
 
 			// Award the player the recipe for using it. Mimics vanilla behaviour.
 			if (!recipe.isSpecial()) {
-				player.awardRecipes(Collections.singleton(recipe));
+				player.awardRecipes(Collections.singleton(recipeHolder));
 			}
 		}
 		duck.setCheckMatrixChanges(true);
-		return recipe == null ? ItemStack.EMPTY : outputCopy;
+		return recipeHolder == null ? ItemStack.EMPTY : outputCopy;
 	}
 
-	public static Recipe<CraftingContainer> findRecipe(CraftingContainer inv, Level level) {
+	public static RecipeHolder<CraftingRecipe> findRecipe(CraftingContainer inv, Level level) {
 		return level.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, inv, level).orElse(null);
+	}
+
+	public static <C extends Container, T extends Recipe<C>> RecipeHolder<T> coerce(RecipeHolder<?> in) {
+		return (RecipeHolder<T>) in;
 	}
 }

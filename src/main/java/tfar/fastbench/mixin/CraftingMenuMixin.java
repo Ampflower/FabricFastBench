@@ -65,7 +65,7 @@ abstract class CraftingMenuMixin<C extends Container> extends RecipeBookMenu<C> 
 
 	@Overwrite
 	public void slotsChanged(Container inventory) {
-		access.execute((lvl, pos) -> MixinHooks.slotChangedCraftingGrid(this.player.level, craftSlots, resultSlots));
+		access.execute((lvl, pos) -> MixinHooks.slotChangedCraftingGrid(this.player.level(), craftSlots, resultSlots));
 	}
 
 	@Inject(method = "quickMoveStack", at = @At("HEAD"), cancellable = true)
