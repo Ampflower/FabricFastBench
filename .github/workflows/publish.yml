@@ -27,13 +27,14 @@ jobs:
           distribution: temurin
           java-version: 17
       - name: Build and publish with Gradle
-        run: ./gradlew build modrinth curseforge --no-daemon
+        run: ./gradlew build modrinth curseforge --continue --no-daemon
         env:
           BUILD_RELEASE: ${{github.event.prelease == false}}
           MODRINTH_TOKEN: ${{secrets.MODRINTH}}
           CURSEFORGE_TOKEN: ${{secrets.CURSEFORGE}}
           CHANGELOG: ${{ github.event.release.body }}
       - name: Upload build artifacts
+        if: always()
         uses: AButler/upload-release-assets@v2.0
         with:
           files: 'build/libs/*'
