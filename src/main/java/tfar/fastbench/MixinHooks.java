@@ -55,7 +55,7 @@ public class MixinHooks {
 			if (recipe == null || !recipe.matches(inv, level)) recipe = findRecipe(inv, level);
 
 			if (recipe != null) {
-				itemstack = recipe.assemble(inv);
+				itemstack = recipe.assemble(inv, level.registryAccess());
 			}
 
 			result.setItem(0, itemstack);
@@ -71,13 +71,13 @@ public class MixinHooks {
 		Recipe<CraftingContainer> recipe = (Recipe<CraftingContainer>) craftResult.getRecipeUsed();
 
 		if (recipe != null && resultSlot != null && resultSlot.hasItem()) {
-			while (recipe.matches(input, player.level)) {
+			while (recipe.matches(input, player.level())) {
 				ItemStack recipeOutput = resultSlot.getItem().copy();
 				outputCopy = recipeOutput.copy();
 
-				recipeOutput.getItem().onCraftedBy(recipeOutput, player.level, player);
+				recipeOutput.getItem().onCraftedBy(recipeOutput, player.level(), player);
 
-				if (!player.level.isClientSide && !((ContainerAccessor) container).insert(recipeOutput, outStart, outEnd, true)) {
+				if (!player.level().isClientSide && !((ContainerAccessor) container).insert(recipeOutput, outStart, outEnd, true)) {
 					duck.setCheckMatrixChanges(true);
 					return ItemStack.EMPTY;
 				}
@@ -85,7 +85,7 @@ public class MixinHooks {
 				resultSlot.onQuickCraft(recipeOutput, outputCopy);
 				resultSlot.setChanged();
 
-				if (!player.level.isClientSide && recipeOutput.getCount() == outputCopy.getCount()) {
+				if (!player.level().isClientSide && recipeOutput.getCount() == outputCopy.getCount()) {
 					duck.setCheckMatrixChanges(true);
 					return ItemStack.EMPTY;
 				}
@@ -95,7 +95,7 @@ public class MixinHooks {
 				//player.drop(resultSlot.getItem(), false);
 			}
 			duck.setCheckMatrixChanges(true);
-			slotChangedCraftingGrid(player.level, input, craftResult);
+			slotChangedCraftingGrid(player.level(), input, craftResult);
 
 			// Award the player the recipe for using it. Mimics vanilla behaviour.
 			if (!recipe.isSpecial()) {

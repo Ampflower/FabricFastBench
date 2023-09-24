@@ -43,6 +43,7 @@ import tfar.fastbench.MixinHooks;
 import tfar.fastbench.interfaces.CraftingInventoryDuck;
 
 import java.util.Collections;
+import java.util.List;
 
 @Mixin(ResultSlot.class)
 public class CraftingResultSlotMixin extends Slot {
@@ -66,15 +67,15 @@ public class CraftingResultSlotMixin extends Slot {
 
 	@Override
 	public void set(ItemStack stack) {
-		if (player.level.isClientSide) {
+		if (player.level().isClientSide) {
 			super.set(stack);
 		}
 		//do nothing
 	}
 
 	@Redirect(method = "checkTakeAchievements",
-			at = @At(value = "INVOKE",target = "Lnet/minecraft/world/inventory/RecipeHolder;awardUsedRecipes(Lnet/minecraft/world/entity/player/Player;)V"))
-	public void no(RecipeHolder recipeUnlocker, Player player) {
+			at = @At(value = "INVOKE", target = "Lnet/minecraft/world/inventory/RecipeHolder;awardUsedRecipes(Lnet/minecraft/world/entity/player/Player;Ljava/util/List;)V"))
+	public void no(final RecipeHolder instance, final Player player, final List<ItemStack> list) {
 		if (((CraftingInventoryDuck) craftSlots).getCheckMatrixChanges() &&
 				this.container instanceof RecipeHolder recipeHolder) {
 			var recipeUsed = recipeHolder.getRecipeUsed();
@@ -89,7 +90,7 @@ public class CraftingResultSlotMixin extends Slot {
 	@Inject(method = "onTake", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/crafting/RecipeManager;getRemainingItemsFor(Lnet/minecraft/world/item/crafting/RecipeType;Lnet/minecraft/world/Container;Lnet/minecraft/world/level/Level;)Lnet/minecraft/core/NonNullList;"))
 	private void cache(Player player, ItemStack stack, CallbackInfo ci) {
 		Recipe<CraftingContainer> lastRecipe = (Recipe<CraftingContainer>) ((ResultContainer)this.container).getRecipeUsed();
-		MixinHooks.lastRecipe = lastRecipe != null && lastRecipe.matches(craftSlots, player.level) ? lastRecipe : null;
+		MixinHooks.lastRecipe = lastRecipe != null && lastRecipe.matches(craftSlots, player.level()) ? lastRecipe : null;
 		MixinHooks.hascachedrecipe = true;
 	}
 }
