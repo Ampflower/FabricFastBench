@@ -36,6 +36,7 @@ import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import tfar.fastbench.interfaces.CraftingInventoryDuck;
+import tfar.fastbench.interfaces.RecipeCoercer;
 import tfar.fastbench.mixin.ContainerAccessor;
 
 import java.util.Collections;
@@ -55,7 +56,8 @@ public class MixinHooks {
 			if (recipe == null || !recipe.matches(inv, level)) recipe = findRecipe(inv, level);
 
 			if (recipe != null) {
-				itemstack = recipe.assemble(inv);
+				// assemble
+				itemstack = ((RecipeCoercer<CraftingContainer>) recipe).method_8116(inv, level.registryAccess());
 			}
 
 			result.setItem(0, itemstack);

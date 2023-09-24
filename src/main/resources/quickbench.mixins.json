@@ -9,6 +9,7 @@
     "CraftingMenuMixin",
     "CraftingResultSlotMixin",
     "PlayerContainerMixin",
+    "RecipeCoercerMixin",
     "RecipeManagerMixin",
     "ServerPlaceRecipeMixin"
   ],
