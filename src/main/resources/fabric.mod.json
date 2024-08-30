@@ -25,7 +25,7 @@
     "quickbench.mixins.json"
   ],
   "depends": {
-    "fabricloader": "*",
+    "fabricloader": ">=0.15.11",
     "minecraft": ">=${minecraftRequired}"
   },
   "custom": {
