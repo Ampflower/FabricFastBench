@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Ampflower
+ * Copyright (c) 2022-2024 Ampflower
  * Copyright (c) 2020-2021 Tfarcenim
  * Copyright (c) 2018-2021 Brennan Ward
  *
@@ -26,6 +26,7 @@
 
 package tfar.fastbench;
 
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -40,10 +41,15 @@ import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import tfar.fastbench.interfaces.CraftingInventoryDuck;
 import tfar.fastbench.mixin.ContainerAccessor;
+import tfar.fastbench.quickbench.internal.Reflector;
 
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodType;
 import java.util.Collections;
 
 public class MixinHooks {
+	private static final MethodHandle recipe$assemble = Reflector.virtual(Recipe.class, "method_8116",
+			MethodType.methodType(ItemStack.class, Container.class, RegistryAccess.class));
 
 	public static boolean hascachedrecipe = false;
 
@@ -58,7 +64,11 @@ public class MixinHooks {
 			if (recipe == null || !recipe.value().matches(inv, level)) recipe = findRecipe(inv, level);
 
 			if (recipe != null) {
-				itemstack = recipe.value().assemble(inv, level.registryAccess());
+				try {
+					itemstack = (ItemStack) recipe$assemble.invoke(recipe.value(), inv, level.registryAccess());
+				} catch (Throwable t) {
+					throw new AssertionError(t);
+				}
 			}
 
 			result.setItem(0, itemstack);

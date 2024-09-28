@@ -26,7 +26,7 @@
   ],
   "depends": {
     "fabricloader": ">=0.15.11",
-    "minecraft": ">=${minecraftRequired}"
+    "minecraft": "${minecraftRequired}"
   },
   "custom": {
     "modmenu": {
