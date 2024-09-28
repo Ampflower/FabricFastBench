@@ -1,0 +1,88 @@
+name: Bug Report
+description: Create a bug report to help us improve
+
+labels: [ 'bug' ]
+assignees: [ 'Ampflower' ]
+
+body:
+  - type: textarea
+    attributes:
+      label: Environment
+      description: |
+        What platform and version of the mod are you using?
+        
+        Example:
+         - **Minecraft**: 1.21.1 Server
+         - **QuickBench**: 4.4.0
+         - **Loader**: Fabric or Forge+Sinytra
+         - **Java**: Adoptium 21.0.2
+         - **Mods**: *Add other mods here, if any. Provide exact versions if possible.*
+      value: |
+        - **Minecraft**:
+        - **QuickBench**:
+        - **Loader**:
+        - **Java**:
+        - **Mods**:
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: To Reproduce
+      description: |
+        Minimum steps required to reproduce the behavior.
+        
+        Feel free to include variations if you find any.
+      placeholder: |
+        ### Botania:
+        1. Open a manufactory halo
+        2. Set an autocrafting recipe
+        3. Have it not autocraft, or lag the entire server
+        
+        ### Item conflict:
+        1. Open a crafting table
+        2. Use a recipe requiring this item
+        3. Have it erroneously consume the item
+
+        ### Other:
+        1. ...
+        2. ...
+        3. ...
+    validations:
+      required: true
+
+  - type: input
+    attributes:
+      label: Expected results
+      description: What behavior was expected?
+      placeholder: e.g. To not consume the crystal, or not add lag
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Logs, crash report, mod list or unmodified mod pack
+      description: |
+        Bugs can be tricky to track down, and more information helps.
+        Include the versions of mods, as mods may change to fix the incompatibility on their own.
+        
+        If you are having crash-related bugs, post the full log and any accompanying crash report.
+        You may use a service such as <https://mclo.gs> to upload your log if you wish.
+      placeholder: |
+        <details><summary>latest.log</summary>
+        
+        ```
+        [00:00:00] [main/INFO]: Loading Minecraft 1.21 with Fabric Loader 0.15.11
+        [00:00:00] [main/INFO]: Loading ??? mods:
+          - fabricloader 0.15.11
+            \-- mixinextras 0.3.5
+          - java 21
+          - minecraft 1.21
+          - quickbench 4.4.0
+          - ...
+        [00:00:00] [main/INFO]: SpongePowered MIXIN Subsystem Version=0.8.5 Source=??? Service=Knot/Fabric Env=SERVER
+        ...
+        ```
+        </details>
+    validations:
+      required: true
