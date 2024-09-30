@@ -47,7 +47,7 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodType;
 import java.util.Collections;
 
-public class MixinHooks {
+public final class MixinHooks {
 	private static final MethodHandle recipe$assemble = Reflector.virtual(Recipe.class, "method_8116",
 			MethodType.methodType(ItemStack.class, Container.class, RegistryAccess.class));
 
@@ -124,6 +124,7 @@ public class MixinHooks {
 		return level.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, inv, level).orElse(null);
 	}
 
+	@SuppressWarnings("unchecked")
 	public static <C extends Container, T extends Recipe<C>> RecipeHolder<T> coerce(RecipeHolder<?> in) {
 		return (RecipeHolder<T>) in;
 	}
