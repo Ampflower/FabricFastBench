@@ -26,17 +26,19 @@
 
 package tfar.fastbench;
 
+import net.minecraft.core.NonNullList;
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.inventory.ResultContainer;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeInput;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import tfar.fastbench.interfaces.CraftingInventoryDuck;
@@ -49,23 +51,25 @@ import java.util.Collections;
 
 public final class MixinHooks {
 	private static final MethodHandle recipe$assemble = Reflector.virtual(Recipe.class, "method_8116",
-			MethodType.methodType(ItemStack.class, Container.class, RegistryAccess.class));
+			MethodType.methodType(ItemStack.class, CraftingInput.class, RegistryAccess.class));
 
 	public static boolean hascachedrecipe = false;
 
-	public static Recipe<CraftingContainer> lastRecipe;
+	public static Recipe<CraftingInput> lastRecipe;
 
-	public static void slotChangedCraftingGrid(Level level, CraftingContainer inv, ResultContainer result) {
+	public static void slotChangedCraftingGrid(Level level, CraftingContainer container, ResultContainer result) {
 		if (!level.isClientSide) {
-
+			CraftingInput input = container.asCraftInput();
 			ItemStack itemstack = ItemStack.EMPTY;
 
 			RecipeHolder<CraftingRecipe> recipe = coerce(result.getRecipeUsed());
-			if (recipe == null || !recipe.value().matches(inv, level)) recipe = findRecipe(inv, level);
+			if (recipe == null || !recipe.value().matches(input, level)) {
+				recipe = findRecipe(input, level);
+			}
 
 			if (recipe != null) {
 				try {
-					itemstack = (ItemStack) recipe$assemble.invoke(recipe.value(), inv, level.registryAccess());
+					itemstack = (ItemStack) recipe$assemble.invoke(recipe.value(), input, level.registryAccess());
 				} catch (Throwable t) {
 					throw new AssertionError(t);
 				}
@@ -77,21 +81,24 @@ public final class MixinHooks {
 		}
 	}
 
-	public static ItemStack handleShiftCraft(Player player, AbstractContainerMenu container, Slot resultSlot, CraftingContainer input, ResultContainer craftResult, int outStart, int outEnd) {
+	public static ItemStack handleShiftCraft(
+			Player player, AbstractContainerMenu menu, Slot resultSlot, CraftingContainer container,
+			ResultContainer craftResult, int outStart, int outEnd) {
 		ItemStack outputCopy = ItemStack.EMPTY;
-		CraftingInventoryDuck duck = (CraftingInventoryDuck) input;
+		CraftingInput input = container.asCraftInput();
+		CraftingInventoryDuck duck = (CraftingInventoryDuck) container;
 		duck.setCheckMatrixChanges(false);
 		RecipeHolder<CraftingRecipe> recipeHolder = coerce(craftResult.getRecipeUsed());
 
 		if (recipeHolder != null && resultSlot != null && resultSlot.hasItem()) {
-			final Recipe<CraftingContainer> recipe = recipeHolder.value();
+			final Recipe<CraftingInput> recipe = recipeHolder.value();
 			while (recipe.matches(input, player.level())) {
 				ItemStack recipeOutput = resultSlot.getItem().copy();
 				outputCopy = recipeOutput.copy();
 
 				recipeOutput.getItem().onCraftedBy(recipeOutput, player.level(), player);
 
-				if (!player.level().isClientSide && !((ContainerAccessor) container).insert(recipeOutput, outStart, outEnd, true)) {
+				if (!player.level().isClientSide && !((ContainerAccessor) menu).insert(recipeOutput, outStart, outEnd, true)) {
 					duck.setCheckMatrixChanges(true);
 					return ItemStack.EMPTY;
 				}
@@ -109,7 +116,7 @@ public final class MixinHooks {
 				//player.drop(resultSlot.getItem(), false);
 			}
 			duck.setCheckMatrixChanges(true);
-			slotChangedCraftingGrid(player.level(), input, craftResult);
+			slotChangedCraftingGrid(player.level(), container, craftResult);
 
 			// Award the player the recipe for using it. Mimics vanilla behaviour.
 			if (!recipe.isSpecial()) {
@@ -120,12 +127,20 @@ public final class MixinHooks {
 		return recipeHolder == null ? ItemStack.EMPTY : outputCopy;
 	}
 
-	public static RecipeHolder<CraftingRecipe> findRecipe(CraftingContainer inv, Level level) {
+	public static RecipeHolder<CraftingRecipe> findRecipe(CraftingInput inv, Level level) {
 		return level.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, inv, level).orElse(null);
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <C extends Container, T extends Recipe<C>> RecipeHolder<T> coerce(RecipeHolder<?> in) {
+	public static <I extends RecipeInput, T extends Recipe<I>> RecipeHolder<T> coerce(RecipeHolder<?> in) {
 		return (RecipeHolder<T>) in;
+	}
+
+	public static NonNullList<ItemStack> copy(RecipeInput recipeInput) {
+		final var list = NonNullList.withSize(recipeInput.size(), ItemStack.EMPTY);
+		for (int i = 0; i < recipeInput.size(); i++) {
+			list.set(i, recipeInput.getItem(i));
+		}
+		return list;
 	}
 }

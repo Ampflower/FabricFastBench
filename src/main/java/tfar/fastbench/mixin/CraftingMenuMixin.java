@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Ampflower
+ * Copyright (c) 2022-2024 Ampflower
  * Copyright (c) 2020-2021 Tfarcenim
  * Copyright (c) 2018-2021 Brennan Ward
  *
@@ -26,7 +26,6 @@
 
 package tfar.fastbench.mixin;
 
-import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.CraftingContainer;
@@ -35,6 +34,9 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.RecipeBookMenu;
 import net.minecraft.world.inventory.ResultContainer;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.CraftingInput;
+import net.minecraft.world.item.crafting.CraftingRecipe;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
@@ -49,7 +51,7 @@ import tfar.fastbench.MixinHooks;
 import tfar.fastbench.interfaces.CraftingInventoryDuck;
 
 @Mixin(CraftingMenu.class)
-abstract class CraftingMenuMixin<C extends Container> extends RecipeBookMenu<C> implements CraftingInventoryDuck {
+abstract class CraftingMenuMixin extends RecipeBookMenu<CraftingInput, CraftingRecipe> implements CraftingInventoryDuck {
 
 	@Shadow
 	@Final
@@ -62,8 +64,11 @@ abstract class CraftingMenuMixin<C extends Container> extends RecipeBookMenu<C> 
 		super(type, syncId);
 	}
 
-	@Redirect(method = "method_17401", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/inventory/CraftingMenu;slotChangedCraftingGrid(Lnet/minecraft/world/inventory/AbstractContainerMenu;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/inventory/CraftingContainer;Lnet/minecraft/world/inventory/ResultContainer;)V"))
-	private void hookChangedCraftingGrid(AbstractContainerMenu self, Level level, Player player, CraftingContainer craftSlots, ResultContainer resultSlots) {
+	@Redirect(method = "method_17401", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/inventory/CraftingMenu;slotChangedCraftingGrid(Lnet/minecraft/world/inventory/AbstractContainerMenu;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/inventory/CraftingContainer;Lnet/minecraft/world/inventory/ResultContainer;Lnet/minecraft/world/item/crafting/RecipeHolder;)V"))
+	private void hookChangedCraftingGrid(
+			final AbstractContainerMenu self, final Level level, final Player player,
+			final CraftingContainer craftSlots, final ResultContainer resultSlots,
+			final RecipeHolder<CraftingRecipe> recipeHolder) {
 		MixinHooks.slotChangedCraftingGrid(level, craftSlots, resultSlots);
 	}
 

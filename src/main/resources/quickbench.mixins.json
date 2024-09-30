@@ -5,7 +5,6 @@
   "mixins": [
     "ContainerAccessor",
     "CraftingContainerMixin",
-    "CraftingInventoryAccessor",
     "CraftingMenuMixin",
     "CraftingResultSlotMixin",
     "PlayerContainerMixin",

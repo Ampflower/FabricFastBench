@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Ampflower
+ * Copyright (c) 2022-2024 Ampflower
  *
  * This software is subject to the terms of either the MIT or CC0-1.0 Licenses.
  * If a copy was not distributed with this file, you can obtain one at
@@ -18,8 +18,9 @@
 package tfar.fastbench.mixin;// Created 2022-05-12T13:17:33
 
 import net.minecraft.recipebook.ServerPlaceRecipe;
-import net.minecraft.world.Container;
 import net.minecraft.world.inventory.RecipeBookMenu;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeInput;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -32,9 +33,9 @@ import tfar.fastbench.interfaces.CraftingInventoryDuck;
  * @since ${version}
  **/
 @Mixin(ServerPlaceRecipe.class)
-public class ServerPlaceRecipeMixin<C extends Container> {
+public class ServerPlaceRecipeMixin<I extends RecipeInput, R extends Recipe<I>> {
     @Shadow
-    protected RecipeBookMenu<C> menu;
+    protected RecipeBookMenu<I, R> menu;
 
     /**
      * Inhibits the matrix check to avoid doing expensive checks for recipes while the inventory is being cleared.

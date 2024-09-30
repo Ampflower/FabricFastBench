@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Ampflower
+ * Copyright (c) 2022-2024 Ampflower
  * Copyright (c) 2020-2021 Tfarcenim
  * Copyright (c) 2018-2021 Brennan Ward
  *
@@ -27,6 +27,7 @@
 package tfar.fastbench.mixin;
 
 
+import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.CraftingContainer;
@@ -35,6 +36,7 @@ import net.minecraft.world.inventory.ResultContainer;
 import net.minecraft.world.inventory.ResultSlot;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import org.spongepowered.asm.mixin.Final;
@@ -97,10 +99,10 @@ public class CraftingResultSlotMixin extends Slot {
 
 	//this.container is actually the crafting result inventory so it's a safe cast
 	//using an inject instead of a redirect as a workaround for tech reborn's BS
-	@Inject(method = "onTake", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/crafting/RecipeManager;getRemainingItemsFor(Lnet/minecraft/world/item/crafting/RecipeType;Lnet/minecraft/world/Container;Lnet/minecraft/world/level/Level;)Lnet/minecraft/core/NonNullList;"))
-	private void cache(Player player, ItemStack stack, CallbackInfo ci) {
+	@Inject(method = "onTake", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/crafting/RecipeManager;getRemainingItemsFor(Lnet/minecraft/world/item/crafting/RecipeType;Lnet/minecraft/world/item/crafting/RecipeInput;Lnet/minecraft/world/level/Level;)Lnet/minecraft/core/NonNullList;"))
+	private void cache(Player player, ItemStack stack, CallbackInfo ci, @Local CraftingInput input) {
 		RecipeHolder<CraftingRecipe> lastRecipe = MixinHooks.coerce(((ResultContainer) this.container).getRecipeUsed());
-		MixinHooks.lastRecipe = lastRecipe != null && lastRecipe.value().matches(craftSlots, player.level()) ? lastRecipe.value() : null;
+		MixinHooks.lastRecipe = lastRecipe != null && lastRecipe.value().matches(input, player.level()) ? lastRecipe.value() : null;
 		MixinHooks.hascachedrecipe = true;
 	}
 }
