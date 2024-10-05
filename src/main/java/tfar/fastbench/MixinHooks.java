@@ -85,14 +85,13 @@ public final class MixinHooks {
 			Player player, AbstractContainerMenu menu, Slot resultSlot, CraftingContainer container,
 			ResultContainer craftResult, int outStart, int outEnd) {
 		ItemStack outputCopy = ItemStack.EMPTY;
-		CraftingInput input = container.asCraftInput();
 		CraftingInventoryDuck duck = (CraftingInventoryDuck) container;
 		duck.setCheckMatrixChanges(false);
 		RecipeHolder<CraftingRecipe> recipeHolder = coerce(craftResult.getRecipeUsed());
 
 		if (recipeHolder != null && resultSlot != null && resultSlot.hasItem()) {
 			final Recipe<CraftingInput> recipe = recipeHolder.value();
-			while (recipe.matches(input, player.level())) {
+			while (recipe.matches(container.asCraftInput(), player.level())) {
 				ItemStack recipeOutput = resultSlot.getItem().copy();
 				outputCopy = recipeOutput.copy();
 
