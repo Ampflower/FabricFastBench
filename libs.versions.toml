@@ -2,8 +2,8 @@
 
 # Minecraft
 minecraft_version = "1.20.4"
-minecraft_required = "~1.20.3-"
-minecraft_compatible = "1.20.3,1.20.4,1.20.5,1.20.6"
+minecraft_required = "~1.20.2-"
+minecraft_compatible = "1.20.2,1.20.3,1.20.4,1.20.5,1.20.6"
 
 fabric_loader = "0.15.+"
 

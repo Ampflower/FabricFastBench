@@ -33,6 +33,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.inventory.ResultContainer;
 import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.Recipe;
@@ -51,6 +52,11 @@ public final class MixinHooks {
 	private static final MethodHandle recipe$assemble = Reflector.virtual(Recipe.class, "method_8116",
 			MethodType.methodType(ItemStack.class, Container.class, RegistryAccess.class));
 
+	private static final MethodHandle item$onCraftedBy = Reflector.virtual(
+			Item.class, MethodType.methodType(void.class, ItemStack.class, Level.class, Player.class),
+			"method_54465", "method_7843"
+	);
+
 	public static boolean hascachedrecipe = false;
 
 	public static Recipe<CraftingContainer> lastRecipe;
@@ -64,11 +70,7 @@ public final class MixinHooks {
 			if (recipe == null || !recipe.value().matches(inv, level)) recipe = findRecipe(inv, level);
 
 			if (recipe != null) {
-				try {
-					itemstack = (ItemStack) recipe$assemble.invoke(recipe.value(), inv, level.registryAccess());
-				} catch (Throwable t) {
-					throw new AssertionError(t);
-				}
+				itemstack = durian(recipe$assemble, recipe.value(), inv, level.registryAccess());
 			}
 
 			result.setItem(0, itemstack);
@@ -89,7 +91,7 @@ public final class MixinHooks {
 				ItemStack recipeOutput = resultSlot.getItem().copy();
 				outputCopy = recipeOutput.copy();
 
-				recipeOutput.getItem().onCraftedBy(recipeOutput, player.level(), player);
+				durian(item$onCraftedBy, recipeOutput.getItem(), recipeOutput, player.level(), player);
 
 				if (!player.level().isClientSide && !((ContainerAccessor) container).insert(recipeOutput, outStart, outEnd, true)) {
 					duck.setCheckMatrixChanges(true);
@@ -127,5 +129,13 @@ public final class MixinHooks {
 	@SuppressWarnings("unchecked")
 	public static <C extends Container, T extends Recipe<C>> RecipeHolder<T> coerce(RecipeHolder<?> in) {
 		return (RecipeHolder<T>) in;
+	}
+
+	public static <T> T durian(MethodHandle handle, Object... objects) {
+		try {
+			return (T) handle.invokeWithArguments(objects);
+		} catch (Throwable t) {
+			throw new AssertionError(t);
+		}
 	}
 }
