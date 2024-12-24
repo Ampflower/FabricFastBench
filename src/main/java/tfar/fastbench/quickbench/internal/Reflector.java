@@ -25,6 +25,7 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.Arrays;
 
 /**
  * @author Ampflower
@@ -85,20 +86,42 @@ public final class Reflector {
         return true;
     }
 
+    private static MethodHandle virtual(MethodType signature, Class<?> clazz, String reference) throws IllegalAccessException {
+        for (final var method : clazz.getMethods()) {
+            if (Modifier.isStatic(method.getModifiers())) {
+                continue;
+            }
+            if (!virtual(method, reference, signature)) {
+                continue;
+            }
+            return lookup.unreflect(method);
+        }
+        return null;
+    }
+
     public static MethodHandle virtual(Class<?> clazz, String reference, MethodType signature) {
         try {
-            for (final var method : clazz.getMethods()) {
-                if (Modifier.isStatic(method.getModifiers())) {
-                    continue;
-                }
-                if (!virtual(method, reference, signature)) {
-                    continue;
-                }
-                return lookup.unreflect(method);
+            final var method = virtual(signature, clazz, reference);
+            if (method != null) {
+                return method;
             }
         } catch (IllegalAccessException e) {
             throw new AssertionError(e);
         }
         throw new AssertionError(clazz + " has no such method: " + reference + signature);
+    }
+
+    public static MethodHandle virtual(Class<?> clazz, MethodType signature, String... reference) {
+        try {
+            for (final var i : reference) {
+                final var method = virtual(signature, clazz, i);
+                if (method != null) {
+                    return method;
+                }
+            }
+        } catch (IllegalAccessException e) {
+            throw new AssertionError(e);
+        }
+        throw new AssertionError(clazz + " has no such method: " + Arrays.toString(reference) + signature);
     }
 }

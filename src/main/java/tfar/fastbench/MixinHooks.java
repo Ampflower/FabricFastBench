@@ -68,11 +68,7 @@ public final class MixinHooks {
 			}
 
 			if (recipe != null) {
-				try {
-					itemstack = (ItemStack) recipe$assemble.invoke(recipe.value(), input, level.registryAccess());
-				} catch (Throwable t) {
-					throw new AssertionError(t);
-				}
+				itemstack = durian(recipe$assemble, recipe.value(), input, level.registryAccess());
 			}
 
 			result.setItem(0, itemstack);
@@ -141,5 +137,13 @@ public final class MixinHooks {
 			list.set(i, recipeInput.getItem(i));
 		}
 		return list;
+	}
+
+	public static <T> T durian(MethodHandle handle, Object... objects) {
+		try {
+			return (T) handle.invokeWithArguments(objects);
+		} catch (Throwable t) {
+			throw new AssertionError(t);
+		}
 	}
 }
