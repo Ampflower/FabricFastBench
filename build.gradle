@@ -88,6 +88,8 @@ task curseforge(type: TaskPublishCurseForge) {
 
     final def mainFile = upload(curseforgeId, tasks.remapJar)
 
+    // Parity of Modrinth to use the version as the display name
+    mainFile.displayName = version
     mainFile.changelog = _changelog
     mainFile.changelogType = "markdown"
     mainFile.releaseType = type
